@@ -1,0 +1,178 @@
+//C++ Arudino
+
+// Combination Lock with 7-segment display
+
+// Variables for reading the potentiometer
+int potPin = A0;
+int Combination = 0;
+
+// LED pin numbers
+int SequenceLED1 = 2;
+int SequenceLED2 = 3;
+int SequenceLED3 = 4;
+int unlockLED = 0;
+
+// Variables for lock values
+/*
+  To change the combination, use the provided chart below.
+  Change the lockValueLow to the lower bound of the number, for example, 100.
+  Change the lockValueHigh to the higher bound of the number, for example, 199.
+
+  The lock values are:
+  0 = 0 - 99
+  1 = 100 - 199
+  2 = 200 - 299
+  3 = 300 - 399
+  4 = 400 - 499
+  5 = 500 - 599
+  6 = 600 - 699
+  7 = 700 - 799
+  8 = 800 - 899
+  9 = 900 - 1000
+*/
+int lockValue1Low = 0;
+int lockValue1High = 99;
+
+int lockValue2Low = 500;
+int lockValue2High = 599;
+
+int lockValue3Low = 200;
+int lockValue3High = 299;
+
+// 7 Segment display input pins
+int G = 10;
+int F = 6;
+int A = 7;
+int B = 9;
+int E = 8;
+int D = 13;
+int C = 11;
+int DP = 12;
+
+// UnlockLED checker
+bool led1On = false;
+bool led2On = false;
+bool led3On = false;
+
+// 7-segment display digits
+void displayDigit(int g, int f, int a, int b, int e, int d, int c, int dp) {
+  digitalWrite(G, g);
+  digitalWrite(F, f);
+  digitalWrite(A, a);
+  digitalWrite(B, b);
+  digitalWrite(E, e);
+  digitalWrite(D, d);
+  digitalWrite(C, c);
+  digitalWrite(DP, dp);
+}
+
+void zero() {
+  // Display digit 0 on the 7-segment display
+  displayDigit(HIGH, LOW, LOW, LOW, LOW, LOW, LOW, LOW);
+}
+
+void one() {
+  // Display digit 1 on the 7-segment display
+  displayDigit(HIGH, HIGH, HIGH, LOW, HIGH, HIGH, LOW, HIGH);
+}
+
+void two() {
+  // Display digit 2 on the 7-segment display
+  displayDigit(LOW, HIGH, LOW, LOW, LOW, LOW, HIGH, HIGH);
+}
+
+void three() {
+  // Display digit 3 on the 7-segment display
+  displayDigit(LOW, HIGH, LOW, LOW, HIGH, LOW, LOW, HIGH);
+}
+
+void four() {
+  // Display digit 4 on the 7-segment display
+  displayDigit(LOW, LOW, HIGH, LOW, HIGH, HIGH, LOW, HIGH);
+}
+
+void five() {
+  // Display digit 5 on the 7-segment display
+  displayDigit(LOW, LOW, LOW, HIGH, HIGH, LOW, LOW, HIGH);
+}
+
+void six() {
+  // Display digit 6 on the 7-segment display
+  displayDigit(LOW, LOW, LOW, HIGH, LOW, LOW, LOW, HIGH);
+}
+
+void seven() {
+  // Display digit 7 on the 7-segment display
+  displayDigit(HIGH, HIGH, LOW, LOW, HIGH, HIGH, LOW, HIGH);
+}
+
+void eight() {
+  // Display digit 8 on the 7-segment display
+  displayDigit(LOW, LOW, LOW, LOW, LOW, LOW, LOW, HIGH);
+}
+
+void nine() {
+  // Display digit 9 on the 7-segment display
+  displayDigit(LOW, LOW, LOW, LOW, HIGH, LOW, LOW, HIGH);
+}
+
+
+
+// Setup
+void setup() {
+  // Set up pin modes
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(D, OUTPUT);
+  pinMode(E, OUTPUT);
+  pinMode(F, OUTPUT);
+  pinMode(G, OUTPUT);
+  pinMode(DP, OUTPUT);
+
+  pinMode(SequenceLED1, OUTPUT);
+  pinMode(SequenceLED2, OUTPUT);
+  pinMode(SequenceLED3, OUTPUT);
+
+  pinMode(unlockLED, OUTPUT);
+}
+
+// Loop
+void loop() {
+  // Mapping combination value
+  int Combination = analogRead(potPin);
+  Combination = map(Combination, 0, 1023, 0, 1000);
+
+  // Display the digit on the 7-segment display
+  if (Combination < 100) zero();
+  else if (Combination < 199) one();
+  else if (Combination < 299) two();
+  else if (Combination < 399) three();
+  else if (Combination < 499) four();
+  else if (Combination < 599) five();
+  else if (Combination < 699) six();
+  else if (Combination < 799) seven();
+  else if (Combination < 899) eight();
+  else nine();
+
+  // Combination checks
+  if (Combination >= lockValue1Low && Combination <= lockValue1High) {
+    digitalWrite(SequenceLED1, HIGH);
+    led1On = true;
+  }
+
+  if (Combination >= lockValue2Low && Combination <= lockValue2High && led1On) {
+    digitalWrite(SequenceLED2, HIGH);
+    led2On = true;
+  }
+
+  if (Combination >= lockValue3Low && Combination <= lockValue3High && led1On && led2On) {
+    digitalWrite(SequenceLED3, HIGH);
+    led3On = true;
+  }
+
+  // Unlock check
+  if (led1On == true && led2On == true && led3On == true) {
+    digitalWrite(unlockLED, HIGH);
+  }
+}
